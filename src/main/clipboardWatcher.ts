@@ -87,5 +87,4 @@ export function setupClipboardWatcher() {
       console.error('Failed to restart clipboard listener:', restartError);
     }
   });
-  });
 }
