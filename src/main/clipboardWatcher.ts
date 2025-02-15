@@ -77,15 +77,21 @@ export function setupClipboardWatcher() {
     }
   });
 
-  // Add error recovery
-  // Handle clipboard listener errors
-  clipboardListener.on('error', () => {
-    console.error('Clipboard listener error occurred');
+  // Add error recovery through the change event
+  // This ensures we can restart the listener if needed
+  clipboardListener.on('change', () => {
     try {
-      console.log('Attempting to restart clipboard listener...');
-      clipboardListener.startListening();
-    } catch (restartError) {
-      console.error('Failed to restart clipboard listener:', restartError);
+      const text = clipboard.readText();
+      if (!text) return;
+      // If we can read the clipboard, the listener is working
+    } catch (error) {
+      console.error('Clipboard access error:', error);
+      try {
+        console.log('Attempting to restart clipboard listener...');
+        clipboardListener.startListening();
+      } catch (restartError) {
+        console.error('Failed to restart clipboard listener:', restartError);
+      }
     }
   });
 }
