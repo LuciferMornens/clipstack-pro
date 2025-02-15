@@ -30,17 +30,11 @@
     "files": [
       "dist/**/*",
       "package.json",
+      "!**/*.db",
       "!**/*.db-journal",
       "!**/*.db.backup-*"
     ],
     "extraResources": [
-      {
-        "from": "dist/db",
-        "to": "app/db",
-        "filter": [
-          "**/*"
-        ]
-      },
       {
         "from": "dist/renderer",
         "to": "app/renderer",
