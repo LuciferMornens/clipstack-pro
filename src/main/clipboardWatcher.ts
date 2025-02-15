@@ -79,7 +79,7 @@ export function setupClipboardWatcher() {
 
   // Add error recovery
   // Handle clipboard listener errors
-  clipboardListener.addListener('error', (error: Error) => {
+  clipboardListener.on('change', (error: Error) => {
     console.error('Clipboard listener error:', error);
     try {
       console.log('Attempting to restart clipboard listener...');
