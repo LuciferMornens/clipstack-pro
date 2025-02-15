@@ -30,7 +30,6 @@
     "files": [
       "dist/**/*",
       "package.json",
-      "!**/*.db",
       "!**/*.db-journal",
       "!**/*.db.backup-*"
     ],

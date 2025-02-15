@@ -7,7 +7,19 @@ import { workerData, parentPort } from 'worker_threads';
 const userDataPath: string = workerData.userDataPath;
 const dbPath = path.join(userDataPath, 'clipstack.db');
 
-const db = new Database(dbPath);
+// Ensure database directory exists
+const fs = require('fs');
+fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+
+let db;
+try {
+  db = new Database(dbPath);
+  console.log(`Database initialized at: ${dbPath}`);
+} catch (error) {
+  console.error(`Failed to initialize database at ${dbPath}:`, error);
+  // Rethrow to ensure main process knows about the failure
+  throw error;
+}
 
 // Create the unified table if it does not exist
 db.exec(`
