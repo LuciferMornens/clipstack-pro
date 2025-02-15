@@ -1,0 +1,98 @@
+{
+  "name": "clipstack-pro",
+  "version": "0.1.0",
+  "description": "Advanced Clipboard Manager with Smart Features",
+  "main": "./dist/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "npm run rebuild && concurrently \"npm run dev:webpack\" \"npm run dev:electron\"",
+    "dev:webpack": "webpack serve --config webpack.config.js",
+    "dev:electron": "wait-on tcp:3000 && tsc && electron . --dev",
+    "build": "npm run clean:dev && cross-env NODE_ENV=production && tsc && webpack --config webpack.config.js --mode production",
+    "watch": "tsc -w",
+    "rebuild": "electron-rebuild",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "clean:dev": "node -e \"const fs=require('fs');const path=require('path');const appData=process.env.APPDATA;const devPath=path.join(appData,'clipstack-pro-dev');if(fs.existsSync(devPath)){console.log('Cleaning dev data...');try{fs.rmSync(devPath,{recursive:true,force:true});console.log('Dev data cleaned successfully');}catch(e){console.warn('Could not clean some dev files:',e);}}\"",
+    "clean:build": "node -e \"const fs=require('fs');const path=require('path');['dist','release'].forEach(dir=>{const p=path.join(__dirname,dir);if(fs.existsSync(p)){console.log(`Cleaning ${dir}...`);try{fs.rmSync(p,{recursive:true,force:true});console.log(`${dir} cleaned successfully`);}catch(e){console.warn(`Could not clean some files in ${dir}:`,e);}}});\"",
+    "clean:modules": "node -e \"const fs=require('fs');const path=require('path');const p=path.join(__dirname,'node_modules');if(fs.existsSync(p)){console.log('Cleaning node_modules...');try{fs.rmSync(p,{recursive:true,force:true});console.log('node_modules cleaned successfully');}catch(e){console.warn('Could not clean some files in node_modules:',e);}}\"",
+    "clean:all": "npm run clean:dev && npm run clean:build && npm run clean:modules"
+  },
+  "build": {
+    "appId": "com.clipstack.pro",
+    "productName": "ClipStack Pro",
+    "asar": true,
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json",
+      "!**/*.db",
+      "!**/*.db-journal",
+      "!**/*.db.backup-*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/renderer",
+        "to": "app/renderer",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/cb.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "assets/cb.ico",
+      "uninstallerIcon": "assets/cb.ico",
+      "installerHeaderIcon": "assets/cb.ico"
+    },
+    "forceCodeSigning": false
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-react": "^7.23.3",
+    "@babel/preset-typescript": "^7.23.3",
+    "@types/better-sqlite3": "^7.6.9",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.52",
+    "@types/react-dom": "^18.2.18",
+    "babel-loader": "^9.1.3",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.11.0",
+    "electron": "^28.2.1",
+    "electron-builder": "^24.9.1",
+    "electron-rebuild": "^3.2.9",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
+    "rimraf": "^4.4.1",
+    "style-loader": "^3.3.4",
+    "typescript": "^5.3.3",
+    "wait-on": "^7.2.0",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.0",
+    "clipboard-event": "^1.6.0",
+    "electron-store": "^8.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
