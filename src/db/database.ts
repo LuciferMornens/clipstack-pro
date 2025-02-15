@@ -25,7 +25,7 @@ interface Response {
   error?: string;
 }
 
-let worker: Worker;
+let worker: Worker | undefined;
 let messageId = 0;
 const pending = new Map<number, { resolve: Function; reject: Function }>();
 
