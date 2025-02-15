@@ -30,7 +30,7 @@ let messageId = 0;
 const pending = new Map<number, { resolve: Function; reject: Function }>();
 
 function initWorker() {
-  if (worker) return;
+  if (worker) return worker;
   const isPackaged = app.isPackaged;
   const workerPath = isPackaged
     ? path.join(process.resourcesPath, 'app', 'db', 'databaseWorker.js')
@@ -39,6 +39,7 @@ function initWorker() {
   worker = new Worker(workerPath, {
     workerData: { userDataPath: app.getPath('userData') }
   });
+  return worker;
   worker.on('message', (message: Response) => {
     const { id, result, error } = message;
     const promise = pending.get(id);
@@ -70,6 +71,10 @@ function sendRequest(action: string, payload: any): Promise<any> {
     const id = messageId++;
     pending.set(id, { resolve, reject });
     const req: Request = { id, action, payload };
+    if (!worker) {
+      reject(new Error('Worker not initialized'));
+      return;
+    }
     worker.postMessage(req);
   });
 }
