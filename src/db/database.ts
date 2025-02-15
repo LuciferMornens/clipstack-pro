@@ -35,9 +35,8 @@ function initWorker() {
   const workerPath = isPackaged
     ? path.join(process.resourcesPath, 'app.asar', 'dist', 'db', 'databaseWorker.js')
     : path.join(__dirname, 'databaseWorker.js');
-  console.log('[database.ts] Worker path:', workerPath);
-  console.log('[database.ts] isPackaged:', isPackaged);
-  console.log('Worker path:', workerPath);
+  console.log('[info]  [database.ts] Initializing DB worker. isPackaged:', isPackaged);
+  console.log('[info]  [database.ts] Worker path:', workerPath);
   worker = new Worker(workerPath, {
     workerData: { userDataPath: app.getPath('userData') }
   });
