@@ -15,6 +15,8 @@ Advanced Clipboard Manager with Smart Features
 
 ## Installation
 
+Supported Platforms: Windows (primary), macOS and Linux support coming soon
+
 1. Download the latest release from the releases page
 2. Run the installer
 3. Launch ClipStack Pro
