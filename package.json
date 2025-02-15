@@ -35,6 +35,13 @@
     ],
     "extraResources": [
       {
+        "from": "dist/db",
+        "to": "app/db",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
         "from": "dist/renderer",
         "to": "app/renderer",
         "filter": [

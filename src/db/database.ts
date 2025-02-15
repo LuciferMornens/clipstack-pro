@@ -31,7 +31,11 @@ const pending = new Map<number, { resolve: Function; reject: Function }>();
 
 function initWorker() {
   if (worker) return;
-  const workerPath = path.join(__dirname, 'databaseWorker.js');
+  const isPackaged = app.isPackaged;
+  const workerPath = isPackaged
+    ? path.join(process.resourcesPath, 'app', 'db', 'databaseWorker.js')
+    : path.join(__dirname, 'databaseWorker.js');
+  console.log('Worker path:', workerPath);
   worker = new Worker(workerPath, {
     workerData: { userDataPath: app.getPath('userData') }
   });
@@ -49,6 +53,13 @@ function initWorker() {
   });
   worker.on('error', (err) => {
     console.error('Database worker error:', err);
+    // Try to reinitialize worker
+    try {
+      worker = null;
+      initWorker();
+    } catch (reinitError) {
+      console.error('Failed to reinitialize worker:', reinitError);
+    }
   });
 }
 
