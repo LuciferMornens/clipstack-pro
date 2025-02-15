@@ -51,11 +51,12 @@ function initWorker() {
       pending.delete(id);
     }
   });
-  worker.on('error', (err) => {
+  worker.on('error', (err: Error) => {
     console.error('Database worker error:', err);
     // Try to reinitialize worker
     try {
-      worker = null;
+      worker?.terminate(); // Properly terminate the worker
+      worker = undefined;  // Use undefined instead of null for Worker type
       initWorker();
     } catch (reinitError) {
       console.error('Failed to reinitialize worker:', reinitError);
