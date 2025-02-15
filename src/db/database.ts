@@ -30,7 +30,7 @@ let messageId = 0;
 const pending = new Map<number, { resolve: Function; reject: Function }>();
 
 function initWorker() {
-  if (worker) return;
+  if (worker) return worker;
   const isPackaged = app.isPackaged;
   const workerPath = isPackaged
     ? path.join(process.resourcesPath, 'app', 'db', 'databaseWorker.js')
@@ -39,6 +39,7 @@ function initWorker() {
   worker = new Worker(workerPath, {
     workerData: { userDataPath: app.getPath('userData') }
   });
+
   worker.on('message', (message: Response) => {
     const { id, result, error } = message;
     const promise = pending.get(id);
@@ -55,13 +56,18 @@ function initWorker() {
     console.error('Database worker error:', err);
     // Try to reinitialize worker
     try {
-      worker?.terminate(); // Properly terminate the worker
-      worker = undefined;  // Use undefined instead of null for Worker type
-      initWorker();
+      if (!worker) {
+        throw new Error('Worker not initialized');
+      }
+      worker.terminate(); // Properly terminate the worker
+      worker = undefined;
+      initWorker(); // This will create a new worker
     } catch (reinitError) {
       console.error('Failed to reinitialize worker:', reinitError);
     }
   });
+  
+  return worker;
 }
 
 function sendRequest(action: string, payload: any): Promise<any> {
@@ -70,6 +76,10 @@ function sendRequest(action: string, payload: any): Promise<any> {
     const id = messageId++;
     pending.set(id, { resolve, reject });
     const req: Request = { id, action, payload };
+    if (!worker) {
+      reject(new Error('Worker not initialized'));
+      return;
+    }
     worker.postMessage(req);
   });
 }
