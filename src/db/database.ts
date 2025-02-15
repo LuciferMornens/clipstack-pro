@@ -39,7 +39,7 @@ function initWorker() {
   worker = new Worker(workerPath, {
     workerData: { userDataPath: app.getPath('userData') }
   });
-  return worker;
+
   worker.on('message', (message: Response) => {
     const { id, result, error } = message;
     const promise = pending.get(id);
@@ -56,13 +56,18 @@ function initWorker() {
     console.error('Database worker error:', err);
     // Try to reinitialize worker
     try {
-      worker?.terminate(); // Properly terminate the worker
-      worker = undefined;  // Use undefined instead of null for Worker type
-      initWorker();
+      if (!worker) {
+        throw new Error('Worker not initialized');
+      }
+      worker.terminate(); // Properly terminate the worker
+      worker = undefined;
+      initWorker(); // This will create a new worker
     } catch (reinitError) {
       console.error('Failed to reinitialize worker:', reinitError);
     }
   });
+  
+  return worker;
 }
 
 function sendRequest(action: string, payload: any): Promise<any> {
